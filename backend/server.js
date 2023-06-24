@@ -7,10 +7,12 @@ const pool = require('./db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
 app.use(cors());
 app.use(express.json());
 
 const verifyRole = (req, res, next) => {
+  console.log('Authorization header:', req.headers.authorization);
   const token = req.headers.authorization;
   if (!token) return res.status(401).json({ error: 'No token provided' });
 
@@ -173,25 +175,28 @@ app.post('/signup', async (req, res) => {
 
 
 // Login
+// Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  
+
   try {
     const users = await pool.query('SELECT * FROM users WHERE email = $1;', [email]);
     if (!users.rows.length) return res.json({ detail: 'User does not exist!' });
     const success = await bcrypt.compare(password, users.rows[0].hashed_password);
+    if (!success) return res.json({ detail: 'Login failed' });
+
     const token = jwt.sign({ email }, 'secret', { expiresIn: '1hr' });
-    if (success) {
+    if (email === 'Issam@gmail.com') {
       res.json({ email: users.rows[0].email, token });
     } else {
       res.json({ detail: 'Login failed' });
     }
   } catch (err) {
     console.error(err);
-    if (err) {
-      res.json({ detail: err.detail });
-    }
+    res.status(500).json({ error: 'An error occurred while logging in' });
   }
 });
+
+
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
