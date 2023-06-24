@@ -1,26 +1,31 @@
-import { useEffect, useState } from 'react'
-import { useCookies } from 'react-cookie'
-const Modal = ({ mode, setShowModal, getData, one}) => {
-  const [cookies, setCookie, removeCookie ] = useCookies(null)
+import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+
+const Modal = ({ mode, setShowModal, getData, one }) => {
+  const [cookies, setCookie, removeCookie] = useCookies(null);
   const editMode = mode === 'edit' ? true : false;
+
   const [data, setData] = useState({
-    title: editMode ? one.title : null,
-    location: editMode ? one.location : null,
-    email: editMode ? one.email : cookies.Email,
+    title: editMode ? one.title : '',
+    location: editMode ? one.location : '',
+    email: editMode ? one.email : cookies.Email || '',
     date: editMode ? one.date : new Date(),
     progress: editMode ? one.progress : 0,
-    
   });
-
 
   const postData = async (e) => {
     e.preventDefault();
     try {
       const response = await fetch('http://localhost:8000/api/v1/fastfood', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer <token>',
+        },
+        
+        body: JSON.stringify({ ...data, email: data.email }),
       });
+
       if (response.status === 200) {
         console.log('WORKED');
         setShowModal(false);
@@ -36,9 +41,14 @@ const Modal = ({ mode, setShowModal, getData, one}) => {
     try {
       const response = await fetch(`http://localhost:8000/api/v1/fastfood/${one.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer <token>',
+        },
+        
+        body: JSON.stringify({ ...data, email: data.email }),
       });
+
       if (response.status === 200) {
         setShowModal(false);
         getData();
@@ -55,9 +65,6 @@ const Modal = ({ mode, setShowModal, getData, one}) => {
       [name]: value,
     }));
   };
-
-  
-  
 
   return (
     <div className="overlay">
@@ -96,12 +103,10 @@ const Modal = ({ mode, setShowModal, getData, one}) => {
             value={data.progress}
             onChange={handleChange}
           />
-          
 
           <button className={mode === 'edit' ? 'edit' : 'add'} onClick={editMode ? editData : postData}>
             {mode === 'edit' ? 'Edit' : 'Add'}
           </button>
-          
         </form>
       </div>
     </div>

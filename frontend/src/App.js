@@ -65,6 +65,7 @@ const App = () => {
             ))}
           </>
         )}
+        
         <p className="copyright">Creative Coding LLC</p>
       </div>
       {showComments && (

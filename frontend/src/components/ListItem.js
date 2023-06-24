@@ -1,11 +1,10 @@
-// ListItem.js
 import React, { useState } from 'react';
 import Modal from './Modal';
 import '../index.css';
 import TickIcon from './TickIcon';
 import ProgressBar from './ProgressBar';
 
-const ListItem = ({ one, getData, viewComments }) => {
+const ListItem = ({ one, getData, viewComments, userEmail, userRole }) => {
   const [showModal, setShowModal] = useState(false);
 
   const deleteItem = async () => {
@@ -29,8 +28,10 @@ const ListItem = ({ one, getData, viewComments }) => {
           `http://localhost:8000/api/v1/fastfood/${one.id}/comments`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ comment }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ comment, userEmail }),
           }
         );
         if (response.status === 200) {
@@ -52,20 +53,19 @@ const ListItem = ({ one, getData, viewComments }) => {
 
       <div className="button-container">
         
+            <button className="edit" onClick={() => setShowModal(true)}>
+              EDIT
+            </button>
+            <button className="delete" onClick={deleteItem}>
+              DELETE
+            </button>
+            <button className="comment" onClick={addComment}>
+              Comment
+            </button>
+            <button className="view" onClick={() => viewComments(one.id)}>
+              View Comments
+            </button>
         
-        <button className="edit" onClick={() => setShowModal(true)}>
-                EDIT
-              </button>
-              <button className="delete" onClick={deleteItem}>
-                DELETE
-        </button>
-       
-        <button className="comment" onClick={addComment}>
-          Comment
-        </button>
-        <button className="view" onClick={() => viewComments(one.id)}>
-          View Comments
-        </button>
       </div>
 
       {showModal && (
