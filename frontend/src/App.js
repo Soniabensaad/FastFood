@@ -1,13 +1,12 @@
-// App.js
 import React, { useEffect, useState } from 'react';
 import ListHeader from './components/ListHeader';
 import ListItem from './components/ListItem';
 import Auth from './components/Auth';
+
 import { useCookies } from 'react-cookie';
 import CommentPopup from './components/CommentPopup';
 
 const App = () => {
-  
   const [cookies, setCookie] = useCookies(null);
   const authToken = cookies.AuthToken;
   const userEmail = cookies.Email;
@@ -35,7 +34,6 @@ const App = () => {
       console.error(err);
     }
   };
-  
 
   useEffect(() => {
     if (authToken) {
@@ -43,12 +41,14 @@ const App = () => {
     }
   }, [authToken]);
 
-  // sort by date
+  // Sort by date
   const sortedFastfood = fastfood?.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <>
+      
       <div className="app">
+        
         {!authToken && <Auth />}
         {authToken && (
           <>
@@ -59,13 +59,11 @@ const App = () => {
                 key={one.id}
                 one={one}
                 getData={getData}
-                viewComments={viewComments} 
-                
+                viewComments={viewComments}
               />
             ))}
           </>
         )}
-        
         <p className="copyright">Creative Coding LLC</p>
       </div>
       {showComments && (

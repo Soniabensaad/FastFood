@@ -7,12 +7,11 @@ const pool = require('./db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
 app.use(cors());
 app.use(express.json());
 
+//roles
 const verifyRole = (req, res, next) => {
-  console.log('Authorization header:', req.headers.authorization);
   const token = req.headers.authorization;
   if (!token) return res.status(401).json({ error: 'No token provided' });
 
@@ -59,15 +58,13 @@ app.get('/api/v1/fastfood', async (req, res) => {
 });
 
 // Add a new fast food item
-app.post('/api/v1/fastfood/',  verifyRole, async (req, res) => {
+app.post('/api/v1/fastfood/', verifyRole, async (req, res) => {
   const { title, location, email, date, progress } = req.body;
   const id = uuidv4();
 
   if (req.userRole !== 'admin') {
     return res.status(403).json({ error: 'Not authorized' });
   }
-
-
   try {
     const newFast = await pool.query(
       `INSERT INTO fastfood (title, location, email, date, progress) VALUES ($1, $2, $3, $4, $5)`,
@@ -133,12 +130,13 @@ app.get('/api/v1/fastfood/:id/comments', async (req, res) => {
 });
 
 // Delete a fast food item
-app.delete('/api/v1/fastfood/:id', verifyRole,  async (req, res) => {
+app.delete('/api/v1/fastfood/:id', verifyRole, async (req, res) => {
   const { id } = req.params;
   try {
     if (req.userRole !== 'admin') {
       return res.status(403).json({ error: 'Not authorized' });
     }
+
     
     const deleteFast = await pool.query('DELETE FROM fastfood WHERE id = $1;', [id]);
     res.json(deleteFast);
@@ -175,28 +173,25 @@ app.post('/signup', async (req, res) => {
 
 
 // Login
-// Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
+  
   try {
     const users = await pool.query('SELECT * FROM users WHERE email = $1;', [email]);
     if (!users.rows.length) return res.json({ detail: 'User does not exist!' });
     const success = await bcrypt.compare(password, users.rows[0].hashed_password);
-    if (!success) return res.json({ detail: 'Login failed' });
-
     const token = jwt.sign({ email }, 'secret', { expiresIn: '1hr' });
-    if (email === 'Issam@gmail.com') {
+    if (success) {
       res.json({ email: users.rows[0].email, token });
     } else {
       res.json({ detail: 'Login failed' });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'An error occurred while logging in' });
+    if (err) {
+      res.json({ detail: err.detail });
+    }
   }
 });
-
-
 
 app.listen(PORT, () => console.log(`Server running on PORT ${PORT}`));
