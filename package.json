@@ -4,7 +4,7 @@
   "description": "",
   
   "scripts": {
-    "build": "npm run build ",
+    "build": "if-env TYPE=backend && (ce backend && npm install) || (cd frontend && npm install)",
     "backend": "node ./backend/server.js",
     "frontend" : "cd frontend && npm start"
   },
