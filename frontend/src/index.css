@@ -360,4 +360,40 @@ input {
 }
 
 
+  /* Media queries for responsiveness */
+@media screen and (max-width: 800px) {
+    .app {
+      width: 90%;
+      margin-top: 20px;
+    }
   
+    
+  }
+
+/* Media query for responsiveness between 600px and 800px */
+@media screen and (min-width: 600px) and (max-width: 800px) {
+    .app {
+      width: 100%;
+      margin-top: 30px;
+    }
+  
+  }
+  
+  @media screen and (max-width: 600px) {
+    .button-container,
+    .info-container,
+    .list-item {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .list-item {
+      justify-content: flex-start;
+    }
+  
+    .modal {
+      width: 90%;
+    }
+  
+    
+  }
